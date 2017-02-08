@@ -15,6 +15,7 @@ struct Set {
 	void (*get)(struct Set* S, const void* key, void* buffer);
 	uint8_t (*find)(struct Set* S, const void* key);
 	void (*destroy)(struct Set* S);
+	void (*delete)(struct Set* S, const void* key);
 };
 
 struct Set* SetTreeCreate(size_t key_size, size_t data_size);
