@@ -17,6 +17,7 @@ uint8_t TreeFindValue(struct Set* S, const void* key);
 void*	TreeInit();
 void	TreeDestroy(struct Set* S);
 void	TreeDelete(struct Set* S, const void* key);
+void	TreeClear(struct Set* S);
 
 struct AVLNode {
 	void* key;
@@ -75,6 +76,13 @@ void TreeDelete(struct Set* S, const void* key)
 {
 	S->structure_pointer = (void*)AVLRemove((struct AVLNode*)S->structure_pointer, key, S->key_size);
 }
+
+void TreeClear(struct Set* S)
+{
+	AVLDestroy((struct AVLNode*)S->structure_pointer);
+	S->structure_pointer = NULL;
+}
+
 
 static int16_t AVLHeight(struct AVLNode* P) 
 {
@@ -276,4 +284,4 @@ int main(int argc, char** argv, char** env)
 	}
 
 }
-*/
+//*/
