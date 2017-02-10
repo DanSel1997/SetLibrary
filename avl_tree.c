@@ -156,14 +156,12 @@ static struct AVLNode* AVLInsert(struct AVLNode* P, const void* key, size_t key_
 	if (P == NULL) {
 		struct AVLNode* newNode = (struct AVLNode*) calloc (sizeof(struct AVLNode), 1);
 
-		newNode->key = calloc (key_size, 1);
+		newNode->key = calloc (key_size + data_size, 1);
 		if (newNode->key == NULL)
 			return NULL;
 		newNode->key = memcpy(newNode->key, key, key_size);
 
-		newNode->data = calloc (data_size, 1);
-		if (newNode->data == NULL)
-			return NULL;
+		newNode->data = newNode->key + key_size;
 		newNode->data = memcpy(newNode->data, data, data_size);
 		return newNode;
 	}
@@ -243,7 +241,6 @@ static void	AVLDestroy(struct AVLNode* P)
 		return;
 	
 	free(P->key);
-	free(P->data);
 
 	AVLDestroy(P->left);
 	AVLDestroy(P->right);
