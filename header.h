@@ -20,7 +20,7 @@ struct Set {
 };
 
 struct Set* SetTreeCreate(size_t key_size, size_t data_size);
-//struct Set* SetHashCreate(size_t key_size, size_t data_size);
+struct Set* SetHashCreate(size_t key_size, size_t data_size);
 
 
 

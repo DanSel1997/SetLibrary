@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv, char** env)
 {
-	struct Set* S = SetTreeCreate(sizeof(int), sizeof(int));
+	struct Set* S = SetHashCreate(sizeof(int), sizeof(int));
 
 	uint8_t set_and_get_test = 1;
 
@@ -57,17 +57,6 @@ int main(int argc, char** argv, char** env)
 	}
 	time = (clock() - time) / CLOCKS_PER_SEC;
 	printf("Time for 10000000 insertions: %lg sec\n", time);
-
-	time = clock();
-	for (int i = 0; i < 100000000; i++) {
-		int a = i;
-		int aa = i * i;
-		S->set(S, &a, &aa);	
-	}
-	time = (clock() - time) / CLOCKS_PER_SEC;
-	printf("Time for 100000000 insertions: %lg sec\n", time);
-	S->clear(S);
-
 
 	S->destroy(S);
 
