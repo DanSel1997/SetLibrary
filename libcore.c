@@ -7,7 +7,7 @@
 
 // Prototypes of main Tree functions
 void	TreeSetValue(struct Set* S, const void* key, const void* data);
-int		TreeGetValue(struct Set* S, const void* key, void* buffer);
+uint8_t	TreeGetValue(struct Set* S, const void* key, void* buffer);
 uint8_t TreeFindValue(struct Set* S, const void* key);
 void*	TreeInit();
 void	TreeDestroy(struct Set* S);
@@ -16,7 +16,7 @@ void	TreeClear(struct Set* S);
 
 // Prototypes of main Hash functions
 void	HashSetValue(struct Set* S, const void* key, const void* data);
-int		HashGetValue(struct Set* S, const void* key, void* buffer);
+uint8_t		HashGetValue(struct Set* S, const void* key, void* buffer);
 uint8_t HashFindValue(struct Set* S, const void* key);
 void*	HashInit();
 void	HashDestroy(struct Set* S);

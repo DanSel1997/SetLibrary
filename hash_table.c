@@ -7,7 +7,7 @@
 #include "header.h"
 
 void	HashSetValue(struct Set* S, const void* key, const void* data);
-int		HashGetValue(struct Set* S, const void* key, void* buffer);
+uint8_t	HashGetValue(struct Set* S, const void* key, void* buffer);
 uint8_t HashFindValue(struct Set* S, const void* key);
 void*	HashInit(struct Set* S);
 void	HashDestroy(struct Set* S);
@@ -29,7 +29,7 @@ void HashSetValue(struct Set* S, const void* key, const void* data)
 	HTSet((struct HT*)(S->structure_pointer), 
 									key, S->key_size, data, S->data_size);
 }
-int	HashGetValue(struct Set* S, const void* key, void* buffer)
+uint8_t	HashGetValue(struct Set* S, const void* key, void* buffer)
 {
 	return HTGet((struct HT*)(S->structure_pointer), 
 									key, S->key_size, buffer, S->data_size);
@@ -82,8 +82,8 @@ uint32_t FAQ6(const void* data, size_t data_size, uint32_t hash_limit)
 	return result % hash_limit;
 }
 
-#define MAX_HASH UINT16_MAX
-#define ALLOCATION_STEP 5
+#define MAX_HASH UINT16_MAX * 256
+#define ALLOCATION_STEP 2
 
 struct HT {
 	uint32_t*	allocated;
@@ -152,10 +152,10 @@ int HTGet(struct HT* H, const void* key, size_t key_size,
 		void* pointer = (H->data[hash]) + (key_size + data_size) * i;
 		if (memcmp(key, pointer, key_size) == 0) {
 			memcpy(buffer, pointer + key_size, data_size);
-			return 0;
+			return 1;
 		}
 	}
-	return -1;
+	return 0;
 }
 
 int HTRemove(struct HT* H, const void* key, size_t key_size, size_t data_size)
@@ -173,10 +173,10 @@ int HTRemove(struct HT* H, const void* key, size_t key_size, size_t data_size)
 				memcpy(pointer, pointer_final, key_size + data_size);
 				H->used[hash]--;
 			}
-			return 0;
+			return 1;
 		}
 	}
-	return -1;
+	return 0;
 }
 
 uint8_t HTFind(struct HT* H, const void* key, size_t key_size, size_t data_size)

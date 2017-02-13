@@ -12,7 +12,7 @@ struct Set {
 	void* structure_pointer;
 
 	void (*set)(struct Set* S, const void* key, const void* data);
-	void (*get)(struct Set* S, const void* key, void* buffer);
+	uint8_t (*get)(struct Set* S, const void* key, void* buffer);
 	uint8_t (*find)(struct Set* S, const void* key);
 	void (*destroy)(struct Set* S);
 	void (*delete)(struct Set* S, const void* key);

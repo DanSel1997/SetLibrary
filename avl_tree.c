@@ -12,7 +12,7 @@
 #include "header.h"
 
 void	TreeSetValue(struct Set* S, const void* key, const void* data);
-int		TreeGetValue(struct Set* S, const void* key, void* buffer);
+uint8_t	TreeGetValue(struct Set* S, const void* key, void* buffer);
 uint8_t TreeFindValue(struct Set* S, const void* key);
 void*	TreeInit();
 void	TreeDestroy(struct Set* S);
@@ -46,14 +46,14 @@ void TreeSetValue(struct Set* S, const void* key, const void* data)
 	S->structure_pointer = (void*) AVLInsert ((struct AVLNode*)S->structure_pointer, key, S->key_size, data, S->data_size);
 }
 
-int	TreeGetValue(struct Set* S, const void* key, void* buffer)
+uint8_t	TreeGetValue(struct Set* S, const void* key, void* buffer)
 {
 	struct AVLNode* R = AVLFind((struct AVLNode*)S->structure_pointer, key, S->key_size);
 	if (R == NULL)
-		return -1;
+		return 0;
 
 	memcpy(buffer, R->data, S->data_size);
-	return 0;
+	return 1;
 }
 
 uint8_t TreeFindValue(struct Set* S, const void* key) 
@@ -196,7 +196,8 @@ static struct AVLNode* AVLRemove(struct AVLNode* P, const void* key, size_t key_
 		struct AVLNode* Q = P->left;
 		struct AVLNode* R = P->right;
 
-		free(P->key); free(P->data); free(P);
+		free(P->key); 
+		free(P);
 		
 		if (!R)
 			return Q;
