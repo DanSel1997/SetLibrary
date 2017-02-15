@@ -11,12 +11,15 @@
 
 #include "header.h"
 
+#ifdef __cplusplus
+	extern "C" {
+#endif
 void	TreeSetValue(struct Set* S, const void* key, const void* data);
 uint8_t	TreeGetValue(struct Set* S, const void* key, void* buffer);
 uint8_t TreeFindValue(struct Set* S, const void* key);
 void*	TreeInit();
 void	TreeDestroy(struct Set* S);
-void	TreeDelete(struct Set* S, const void* key);
+void	TreeRemove(struct Set* S, const void* key);
 void	TreeClear(struct Set* S);
 
 struct AVLNode {
@@ -40,6 +43,10 @@ static struct AVLNode*	AVLInsert(struct AVLNode* P, const void* key, size_t key_
 static struct AVLNode*	AVLRemove(struct AVLNode* P, const void* key, size_t key_size);
 static struct AVLNode*	AVLFind(struct AVLNode* P, const void* key, size_t key_size);
 static void				AVLDestroy(struct AVLNode* P);		
+
+#ifdef __cplusplus
+	}
+#endif
 
 void TreeSetValue(struct Set* S, const void* key, const void* data) 
 {
@@ -72,7 +79,7 @@ void TreeDestroy(struct Set* S)
 	free(S);
 }
 
-void TreeDelete(struct Set* S, const void* key)
+void TreeRemove(struct Set* S, const void* key)
 {
 	S->structure_pointer = (void*)AVLRemove((struct AVLNode*)S->structure_pointer, key, S->key_size);
 }

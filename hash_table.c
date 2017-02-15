@@ -6,12 +6,16 @@
 
 #include "header.h"
 
+#ifdef __cplusplus
+	extern "C" {
+#endif
+
 void	HashSetValue(struct Set* S, const void* key, const void* data);
 uint8_t	HashGetValue(struct Set* S, const void* key, void* buffer);
 uint8_t HashFindValue(struct Set* S, const void* key);
 void*	HashInit(struct Set* S);
 void	HashDestroy(struct Set* S);
-void	HashDelete(struct Set* S, const void* key);
+void	HashRemove(struct Set* S, const void* key);
 void	HashClear(struct Set* S);
 
 struct HT* HTInit(size_t key_size, size_t data_size);
@@ -22,6 +26,9 @@ uint8_t HTFind(struct HT* H, const void* key, size_t key_size, size_t data_size)
 void HTClear(struct HT* H);
 void HTDestroy(struct HT* H);
 
+#ifdef __cplusplus
+	}
+#endif
 
 // HT
 void HashSetValue(struct Set* S, const void* key, const void* data)
@@ -53,7 +60,7 @@ void HashDestroy(struct Set* S)
 	free(S);
 }
 
-void HashDelete(struct Set* S, const void* key)
+void HashRemove(struct Set* S, const void* key)
 {
 	HTRemove((struct HT*)(S->structure_pointer), key, S->key_size, S->data_size);
 }
@@ -118,10 +125,10 @@ void HTSet(struct HT* H, const void* key, size_t key_size,
 									const void* data, size_t data_size)
 {
 	uint32_t hash = FAQ6(key, key_size, MAX_HASH);
-	for (int i = 0; i < H->used[hash]; i++) {
-		void* pointer = (H->data[hash]) + (key_size + data_size) * i;
-		if (memcmp(key, pointer, key_size) == 0) {
-			memcpy(pointer + key_size, data, data_size);
+	for (uint32_t i = 0; i < H->used[hash]; i++) {
+		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
+		if (memcmp(key, (void*)pointer, key_size) == 0) {
+			memcpy((void*)(pointer + key_size), data, data_size);
 			return;
 		}
 	}
@@ -133,11 +140,11 @@ void HTSet(struct HT* H, const void* key, size_t key_size,
 		H->allocated[hash] += ALLOCATION_STEP;
 	}
 
-	void* pointer = (H->data[hash]) + 
+	uint8_t* pointer = ((uint8_t*)H->data[hash]) + 
 			(key_size + data_size) *  H->used[hash];
 
-	memcpy(pointer, key, key_size);
-	memcpy(pointer + key_size, data, data_size);
+	memcpy((void*)pointer, key, key_size);
+	memcpy((void*)(pointer + key_size), data, data_size);
 	H->used[hash]++;
 	
 	return;
@@ -148,10 +155,10 @@ int HTGet(struct HT* H, const void* key, size_t key_size,
 {
 	uint32_t hash = FAQ6(key, key_size, MAX_HASH);
 	
-	for (int i = 0; i < H->used[hash]; i++) {
-		void* pointer = (H->data[hash]) + (key_size + data_size) * i;
-		if (memcmp(key, pointer, key_size) == 0) {
-			memcpy(buffer, pointer + key_size, data_size);
+	for (uint32_t i = 0; i < H->used[hash]; i++) {
+		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
+		if (memcmp(key, (void*)pointer, key_size) == 0) {
+			memcpy(buffer, (void*)(pointer + key_size), data_size);
 			return 1;
 		}
 	}
@@ -162,15 +169,15 @@ int HTRemove(struct HT* H, const void* key, size_t key_size, size_t data_size)
 {
 	uint32_t hash = FAQ6(key, key_size, MAX_HASH);
 
-	for (int i = 0; i < H->used[hash]; i++) {
-		void* pointer = (H->data[hash]) + (key_size + data_size) * i;
-		if (memcmp(key, pointer, key_size) == 0) {
+	for (uint32_t i = 0; i < H->used[hash]; i++) {
+		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
+		if (memcmp(key, (void*)pointer, key_size) == 0) {
 			if (i + 1 == H->used[hash]) 
 				H->used[hash]--;
 			else {
-				void* pointer_final = (H->data[i]) + 
+				uint8_t* pointer_final = ((uint8_t*)H->data[i]) + 
 					(key_size + data_size) * (H->used[hash] - 1);
-				memcpy(pointer, pointer_final, key_size + data_size);
+				memcpy((void*)pointer, (void*)pointer_final, key_size + data_size);
 				H->used[hash]--;
 			}
 			return 1;
@@ -183,9 +190,9 @@ uint8_t HTFind(struct HT* H, const void* key, size_t key_size, size_t data_size)
 {
 	uint32_t hash = FAQ6(key, key_size, MAX_HASH);
 	
-	for (int i = 0; i < H->used[hash]; i++) {
-		void* pointer = (H->data[hash]) + (key_size + data_size) * i;
-		if (memcmp(key, pointer, key_size) == 0) 
+	for (uint32_t i = 0; i < H->used[hash]; i++) {
+		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
+		if (memcmp(key, (void*)pointer, key_size) == 0) 
 			return 1;
 	}
 	return 0;

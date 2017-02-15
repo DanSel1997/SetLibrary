@@ -69,7 +69,7 @@ void insert_int_time_test(struct Set* S, size_t count)
 	struct timeval tm;
 	log("insertion time test started, size = %d", (int)count);
 	shared_timer_reset(&tm);
-	for (int i = 0; i < count; i++) {
+	for (uint32_t i = 0; i < count; i++) {
 		int key = rand();
 		int data = rand();
 		S->set(S, &key, &data);
@@ -97,7 +97,7 @@ uint8_t insert_and_find_int_test(struct Set* S)
 	}
 	for (int i = 0; i < TSize; i += 5) {
 		int key = i;
-		S->delete(S, &key);
+			S->remove(S, &key);
 	}
 
 	for (int i = 0; i < TSize; i++) {
