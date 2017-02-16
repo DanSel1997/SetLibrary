@@ -90,7 +90,7 @@ uint32_t FAQ6(const void* data, size_t data_size, uint32_t hash_limit)
 }
 
 #define MAX_HASH UINT16_MAX * 256
-#define ALLOCATION_STEP 2
+#define ALLOCATION_STEP 3
 
 struct HT {
 	uint32_t*	allocated;
@@ -111,13 +111,6 @@ struct HT* HTInit(size_t key_size, size_t data_size)
 	if (result->used == NULL || result->allocated == NULL 
 												|| result->data == NULL) 
 		return NULL;
-
-	for (int i = 0; i < MAX_HASH; i++) {
-		result->data[i] = (void*)calloc(key_size + data_size, ALLOCATION_STEP);
-		if (result->data[i] == NULL)
-			return NULL;
-		result->allocated[i] = ALLOCATION_STEP;
-	}
 	return result;
 }
 
@@ -132,21 +125,18 @@ void HTSet(struct HT* H, const void* key, size_t key_size,
 			return;
 		}
 	}
-	
-	if (H->used[hash] < H->allocated[hash]) {
+	if (H->used[hash] == H->allocated[hash]) {
 		size_t new_size = (H->allocated[hash] + ALLOCATION_STEP) * 
 													(key_size + data_size);
 		H->data[hash] = realloc (H->data[hash], new_size);
 		H->allocated[hash] += ALLOCATION_STEP;
 	}
-
 	uint8_t* pointer = ((uint8_t*)H->data[hash]) + 
 			(key_size + data_size) *  H->used[hash];
 
 	memcpy((void*)pointer, key, key_size);
 	memcpy((void*)(pointer + key_size), data, data_size);
 	H->used[hash]++;
-	
 	return;
 }
 
