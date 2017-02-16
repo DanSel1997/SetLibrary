@@ -1,0 +1,38 @@
+[==========] Running 12 tests from 3 test cases.
+[----------] Global test environment set-up.
+[----------] 4 tests from TREE
+[ RUN      ] TREE.INSERT_AND_FIND
+[       OK ] TREE.INSERT_AND_FIND (8 ms)
+[ RUN      ] TREE.INSERT_AND_GET
+[       OK ] TREE.INSERT_AND_GET (7 ms)
+[ RUN      ] TREE.INSERT_REWRITE_GET
+[       OK ] TREE.INSERT_REWRITE_GET (14 ms)
+[ RUN      ] TREE.INSERT_REMOVE_INSERT_FIND
+[       OK ] TREE.INSERT_REMOVE_INSERT_FIND (17 ms)
+[----------] 4 tests from TREE (47 ms total)
+
+[----------] 4 tests from TIME
+[ RUN      ] TIME.TREE_INSERT_REWRITE_GET_1_000_000
+[       OK ] TIME.TREE_INSERT_REWRITE_GET_1_000_000 (1587 ms)
+[ RUN      ] TIME.TREE_INSERT_REWRITE_GET_10_000_000
+[       OK ] TIME.TREE_INSERT_REWRITE_GET_10_000_000 (43129 ms)
+[ RUN      ] TIME.HASH_INSERT_REWRITE_GET_1_000_000
+[       OK ] TIME.HASH_INSERT_REWRITE_GET_1_000_000 (3936 ms)
+[ RUN      ] TIME.HASH_INSERT_REWRITE_GET_10_000_000
+[       OK ] TIME.HASH_INSERT_REWRITE_GET_10_000_000 (7507 ms)
+[----------] 4 tests from TIME (56159 ms total)
+
+[----------] 4 tests from HASH
+[ RUN      ] HASH.INSERT_AND_FIND
+[       OK ] HASH.INSERT_AND_FIND (77 ms)
+[ RUN      ] HASH.INSERT_AND_GET
+[       OK ] HASH.INSERT_AND_GET (79 ms)
+[ RUN      ] HASH.INSERT_REWRITE_GET
+[       OK ] HASH.INSERT_REWRITE_GET (81 ms)
+[ RUN      ] HASH.INSERT_REMOVE_INSERT_FIND
+[       OK ] HASH.INSERT_REMOVE_INSERT_FIND (81 ms)
+[----------] 4 tests from HASH (318 ms total)
+
+[----------] Global test environment tear-down
+[==========] 12 tests from 3 test cases ran. (56524 ms total)
+[  PASSED  ] 12 tests.
