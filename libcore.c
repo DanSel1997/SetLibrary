@@ -31,7 +31,7 @@ void	HashClear(struct Set* S);
 	}
 #endif
 
-struct Set* SetTreeCreate(size_t key_size, size_t data_size)
+struct Set* MapTreeCreate(size_t key_size, size_t data_size)
 {
 	struct Set* result = (struct Set*) calloc (sizeof(struct Set), 1);
 
@@ -48,7 +48,7 @@ struct Set* SetTreeCreate(size_t key_size, size_t data_size)
 	return result;
 }
 
-struct Set* SetHashCreate(size_t key_size, size_t data_size)
+struct Set* MapHashCreate(size_t key_size, size_t data_size)
 {
 	struct Set* result = (struct Set*) calloc (sizeof(struct Set), 1);
 

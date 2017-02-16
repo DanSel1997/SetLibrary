@@ -1,6 +1,3 @@
-#define _BSD_SOURCE
-#define _GNU_SOURCE
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -168,7 +165,7 @@ static struct AVLNode* AVLInsert(struct AVLNode* P, const void* key, size_t key_
 			return NULL;
 		newNode->key = memcpy(newNode->key, key, key_size);
 
-		newNode->data = newNode->key + key_size;
+		newNode->data = (void*)((uint8_t*)newNode->key + key_size);
 		newNode->data = memcpy(newNode->data, data, data_size);
 		return newNode;
 	}

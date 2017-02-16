@@ -146,7 +146,7 @@ int main(int argc, char** argv, char** env)
 
 	insert_int_time_test(S, 1000);
 	insert_int_time_test(S, 1000000);
-	insert_int_time_test(S, 10000000);
+	//insert_int_time_test(S, 10000000);
 
 	S->destroy(S);
 	return 0;

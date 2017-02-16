@@ -1,3 +1,6 @@
+#ifndef __LIBHEAADER_INCLUDE
+#define __LIBHEAADER_INCLUDE
+
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -18,11 +21,14 @@ struct Set {
 	void (*clear)(struct Set* S);
 };
 
-struct Set* SetTreeCreate(size_t key_size, size_t data_size);
-struct Set* SetHashCreate(size_t key_size, size_t data_size);
+struct Set* MapTreeCreate(size_t key_size, size_t data_size);
+struct Set* MapHashCreate(size_t key_size, size_t data_size);
+
+typedef struct Set* map_t;
 
 #ifdef __cplusplus
 	}
 #endif
 
+#endif //__LIBHEAADER_INCLUDE
  
