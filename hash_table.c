@@ -89,7 +89,7 @@ uint32_t FAQ6(const void* data, size_t data_size, uint32_t hash_limit)
 	return result % hash_limit;
 }
 
-#define MAX_HASH UINT16_MAX * 256
+#define MAX_HASH 256 * 256 * 256
 #define ALLOCATION_STEP 3
 
 struct HT {
@@ -162,10 +162,10 @@ int HTRemove(struct HT* H, const void* key, size_t key_size, size_t data_size)
 	for (uint32_t i = 0; i < H->used[hash]; i++) {
 		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
 		if (memcmp(key, (void*)pointer, key_size) == 0) {
-			if (i + 1 == H->used[hash]) 
+			if (i + 1 == H->used[hash])
 				H->used[hash]--;
 			else {
-				uint8_t* pointer_final = ((uint8_t*)H->data[i]) + 
+				uint8_t* pointer_final = ((uint8_t*)H->data[hash]) + 
 					(key_size + data_size) * (H->used[hash] - 1);
 				memcpy((void*)pointer, (void*)pointer_final, key_size + data_size);
 				H->used[hash]--;
