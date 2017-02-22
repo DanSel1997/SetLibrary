@@ -120,6 +120,25 @@ TEST(HASH, INSERT_REMOVE_INSERT_FIND)
 	M->destroy(M);
 }
 
+static void hash_accumulate(const void* key, const void* data, const void* arg)
+{
+	*(int*)arg += *(int*)key + *(int*)data * 3;
+}
+
+TEST(HASH, FOREACH)
+{
+	map_t M = MapHashCreate(sizeof(int), sizeof(int));
+	int sum = 0, control_sum = 0;
+	for (int i = 0; i < 1000; i++) {
+		int b = i * i;
+		M->set(M, &i, &b);
+		hash_accumulate(&i, &b, &control_sum);
+	}
+	M->foreach(M, &sum, hash_accumulate);
+	ASSERT_EQ(sum, control_sum);
+	M->destroy(M);
+}
+
 TEST(TIME, HASH_INSERT_REWRITE_GET_1_000_000)
 {
 	int a;

@@ -19,6 +19,8 @@ struct Set {
 	void (*destroy)(struct Set* S);
 	void (*remove)(struct Set* S, const void* key);
 	void (*clear)(struct Set* S);
+	void (*foreach)(struct Set* S, const void* arg, 
+		void (*function)(const void* key, const void* data, const void* arg));
 };
 
 struct Set* MapTreeCreate(size_t key_size, size_t data_size);

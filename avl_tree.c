@@ -18,6 +18,8 @@ void*	TreeInit();
 void	TreeDestroy(struct Set* S);
 void	TreeRemove(struct Set* S, const void* key);
 void	TreeClear(struct Set* S);
+void	TreeForeach(struct Set* S, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg));
 
 struct AVLNode {
 	void* key;
@@ -40,6 +42,8 @@ static struct AVLNode*	AVLInsert(struct AVLNode* P, const void* key, size_t key_
 static struct AVLNode*	AVLRemove(struct AVLNode* P, const void* key, size_t key_size);
 static struct AVLNode*	AVLFind(struct AVLNode* P, const void* key, size_t key_size);
 static void				AVLDestroy(struct AVLNode* P);		
+void		  AVLForeach(struct AVLNode* P, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg));
 
 #ifdef __cplusplus
 	}
@@ -86,8 +90,13 @@ void TreeClear(struct Set* S)
 	AVLDestroy((struct AVLNode*)S->structure_pointer);
 	S->structure_pointer = NULL;
 }
+void	TreeForeach(struct Set* S, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg))
+{
+	AVLForeach((struct AVLNode*)(S->structure_pointer), arg, function);
+}
 
-
+////////////////////////////////////////////////////////////////////////////
 static int16_t AVLHeight(struct AVLNode* P) 
 {
 	return P ? P->height : 0;
@@ -251,39 +260,13 @@ static void	AVLDestroy(struct AVLNode* P)
 	AVLDestroy(P->right);
 	free(P);
 }
-/*
-int main(int argc, char** argv, char** env)
+void AVLForeach(struct AVLNode* P, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg))
 {
-	size_t key_size = sizeof(int);
-	size_t data_size = sizeof(int);
-
-	struct AVLNode* S = NULL;
-
-	int a = 4;
-	int b = 6;
-	int c = 8;
-	
-	int aa = 44;
-	int bb = 21;
-	int cc = 43;
-
-	int d;
-	int dd;
-	
-	for (int j = 0; j < 10; j++) {
-		a = rand() % 10;
-		aa = a * a;
-		S = AVLInsert(S, &a, key_size, &aa, data_size);
-		AVLDBGPrint(S, 0);
-		printf("-------------------------------\n");
-	}
-	for (int j = 0; j < 10; j++) {
-		a = rand() % 10;
-		struct AVLNode* F = AVLFind(S, &a, key_size);
-		printf("a = %d, F = %p\n", a, F);
-		if (F != NULL)
-			printf("aa = %d\n", *(int*)F->data);
-	}
-
+	if (P == NULL)
+		return;
+	AVLForeach(P->right, arg, function);		
+	function(P->key, P->data, arg);
+	AVLForeach(P->left, arg, function);	
+	return;
 }
-//*/

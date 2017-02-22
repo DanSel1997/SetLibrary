@@ -17,6 +17,8 @@ void*	HashInit(struct Set* S);
 void	HashDestroy(struct Set* S);
 void	HashRemove(struct Set* S, const void* key);
 void	HashClear(struct Set* S);
+void	HashForeach(struct Set* S, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg));
 
 struct HT* HTInit(size_t key_size, size_t data_size);
 void HTSet(struct HT* H, const void* key, size_t key_size, const void* data, size_t data_size);
@@ -25,6 +27,9 @@ int HTRemove(struct HT* H, const void* key, size_t key_size, size_t data_size);
 uint8_t HTFind(struct HT* H, const void* key, size_t key_size, size_t data_size);
 void HTClear(struct HT* H);
 void HTDestroy(struct HT* H);
+void HTForeach(struct HT* H, size_t key_size, size_t data_size, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg));
+
 
 #ifdef __cplusplus
 	}
@@ -88,9 +93,16 @@ uint32_t FAQ6(const void* data, size_t data_size, uint32_t hash_limit)
 	result += result << 15;
 	return result % hash_limit;
 }
+void	HashForeach(struct Set* S, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg))
+{
+	HTForeach((struct HT*)(S->structure_pointer), S->key_size, S->data_size, 
+														arg, function);
+}
 
+////////////////////////////////////////////////////////////////////////
 #define MAX_HASH 256 * 256 * 256
-#define ALLOCATION_STEP 3
+#define ALLOCATION_STEP 2
 
 struct HT {
 	uint32_t*	allocated;
@@ -203,29 +215,20 @@ void HTDestroy(struct HT* H)
 	free(H->allocated);
 }
 
-/*
-int main(int argc, char** argv, char** env)
+void HTForeach(struct HT* H, size_t key_size, size_t data_size, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg))
 {
-	size_t size = sizeof(int);
-	
-	int a = 5, aa = 25;
-	struct HT* H = HTInit(size, size);
-	HTSet(H, &a, size, &aa, size);
-	aa = 44;
-	int status = HTGet(H, &a, size, &aa, size);
-	printf("status = %d\n", status);
-	printf("aa = %d\n", aa);
-	
-	HTClear(H);
-	aa = 66;
-	status = HTGet(H, &a, size, &aa, size);
-	printf("status = %d\n");
-	printf("aa = %d\n", aa);
-
-	HTDestroy(H);
-	return 0;
+	for (uint32_t i = 0; i < MAX_HASH; i++)
+	{
+		for (uint32_t j = 0; j < H->used[i]; j++) { 
+			void* key = ((uint8_t*)H->data[i]) + 
+					(key_size + data_size) * j;
+			void* data = (uint8_t*)key + key_size;
+			function(key, data, arg);
+		}
+	}
+	return;
 }
-//*/
 
 
 

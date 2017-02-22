@@ -17,6 +17,8 @@ void*	TreeInit();
 void	TreeDestroy(struct Set* S);
 void	TreeRemove(struct Set* S, const void* key);
 void	TreeClear(struct Set* S);
+void	TreeForeach(struct Set* S, const void* arg, 
+		void (*function)(const void* key, const void* data, const void* arg));
 
 // Prototypes of main Hash functions
 void	HashSetValue(struct Set* S, const void* key, const void* data);
@@ -26,6 +28,8 @@ void*	HashInit(struct Set* S);
 void	HashDestroy(struct Set* S);
 void	HashRemove(struct Set* S, const void* key);
 void	HashClear(struct Set* S);
+void	HashForeach(struct Set* S, const void* arg,
+		void (*function)(const void* key, const void* data, const void* arg));
 
 #ifdef __cplusplus
 	}
@@ -45,6 +49,8 @@ struct Set* MapTreeCreate(size_t key_size, size_t data_size)
 	result->destroy = TreeDestroy;
 	result->remove = TreeRemove;
 	result->clear = TreeClear;
+	result->foreach = TreeForeach;
+
 	return result;
 }
 
@@ -62,7 +68,8 @@ struct Set* MapHashCreate(size_t key_size, size_t data_size)
 	result->destroy = HashDestroy;
 	result->remove = HashRemove;
 	result->clear = HashClear;
+	result->foreach = HashForeach;
+
 	return result;
 }
-
 
