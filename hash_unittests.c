@@ -124,7 +124,7 @@ TEST(HASH, INSERT_REMOVE_INSERT_FIND)
 	M->destroy(M);
 }
 
-static void hash_accumulate(const void* key, const void* data, const void* arg)
+static void accumulate(const void* key, const void* data, const void* arg)
 {
 	*(int*)arg += *(int*)key + *(int*)data * 3;
 }
@@ -136,9 +136,9 @@ TEST(HASH, FOREACH)
 	for (int i = 0; i < 1000; i++) {
 		int b = i * i;
 		M->set(M, &i, &b);
-		hash_accumulate(&i, &b, &control_sum);
+		accumulate(&i, &b, &control_sum);
 	}
-	M->foreach(M, &sum, hash_accumulate);
+	M->foreach(M, &sum, accumulate);
 	ASSERT_EQ(sum, control_sum);
 	M->destroy(M);
 }
