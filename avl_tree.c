@@ -29,20 +29,23 @@ struct AVLNode {
 	int16_t height;
 };
 
-static int16_t			AVLHeight(struct AVLNode* P);
-static int16_t			AVLBalanceFactor(struct AVLNode* P);
-static struct			AVLNode* AVLFindMin(struct AVLNode* P);
-static struct			AVLNode* AVLRemoveMin(struct AVLNode* P);
-void					AVLFixHeight(struct AVLNode* P);
-static struct AVLNode*	AVLRotateRight(struct AVLNode* P);
-static struct AVLNode*	AVLRotateLeft(struct AVLNode* P);
-static struct AVLNode*	AVLBalance(struct AVLNode* P);
+typedef struct AVLNode* __node_t;
 
-static struct AVLNode*	AVLInsert(struct AVLNode* P, const void* key, size_t key_size, const void* data, size_t data_size);
-static struct AVLNode*	AVLRemove(struct AVLNode* P, const void* key, size_t key_size);
-static struct AVLNode*	AVLFind(struct AVLNode* P, const void* key, size_t key_size);
-static void				AVLDestroy(struct AVLNode* P);		
-void		  AVLForeach(struct AVLNode* P, const void* arg,
+static int16_t			AVLHeight(__node_t P);
+static int16_t			AVLBalanceFactor(__node_t P);
+static struct			AVLNode* AVLFindMin(__node_t P);
+static struct			AVLNode* AVLRemoveMin(__node_t P);
+void					AVLFixHeight(__node_t P);
+static __node_t	AVLRotateRight(__node_t P);
+static __node_t	AVLRotateLeft(__node_t P);
+static __node_t	AVLBalance(__node_t P);
+
+static __node_t	AVLInsert(__node_t P, const void* key, 
+		size_t key_size, const void* data, size_t data_size);
+static __node_t	AVLRemove(__node_t P, const void* key, size_t key_size);
+static __node_t	AVLFind(__node_t P, const void* key, size_t key_size);
+static void				AVLDestroy(__node_t P);		
+void		  AVLForeach(__node_t P, const void* arg,
 		void (*function)(const void* key, const void* data, const void* arg));
 
 #ifdef __cplusplus
@@ -51,12 +54,13 @@ void		  AVLForeach(struct AVLNode* P, const void* arg,
 
 void TreeSetValue(struct Set* S, const void* key, const void* data) 
 {
-	S->structure_pointer = (void*) AVLInsert ((struct AVLNode*)S->structure_pointer, key, S->key_size, data, S->data_size);
+	S->structure_pointer = (void*) AVLInsert ((__node_t)S->structure_pointer, 
+										key, S->key_size, data, S->data_size);
 }
 
 uint8_t	TreeGetValue(struct Set* S, const void* key, void* buffer)
 {
-	struct AVLNode* R = AVLFind((struct AVLNode*)S->structure_pointer, key, S->key_size);
+	__node_t R = AVLFind((__node_t)S->structure_pointer, key, S->key_size);
 	if (R == NULL)
 		return 0;
 
@@ -66,7 +70,8 @@ uint8_t	TreeGetValue(struct Set* S, const void* key, void* buffer)
 
 uint8_t TreeFindValue(struct Set* S, const void* key) 
 {
-	return (AVLFind((struct AVLNode*)S->structure_pointer, key, S->key_size) == NULL) ? 0 : 1;
+	return (AVLFind((__node_t)S->structure_pointer, key, S->key_size)
+														== NULL) ? 0 : 1;
 }
 
 void* TreeInit()
@@ -76,43 +81,44 @@ void* TreeInit()
 
 void TreeDestroy(struct Set* S)
 {
-	AVLDestroy((struct AVLNode*)S->structure_pointer);
+	AVLDestroy((__node_t)S->structure_pointer);
 	free(S);
 }
 
 void TreeRemove(struct Set* S, const void* key)
 {
-	S->structure_pointer = (void*)AVLRemove((struct AVLNode*)S->structure_pointer, key, S->key_size);
+	S->structure_pointer = (void*)AVLRemove((__node_t)S->structure_pointer, 
+											key, S->key_size);
 }
 
 void TreeClear(struct Set* S)
 {
-	AVLDestroy((struct AVLNode*)S->structure_pointer);
+	AVLDestroy((__node_t)S->structure_pointer);
 	S->structure_pointer = NULL;
 }
 void	TreeForeach(struct Set* S, const void* arg,
 		void (*function)(const void* key, const void* data, const void* arg))
 {
-	AVLForeach((struct AVLNode*)(S->structure_pointer), arg, function);
+	AVLForeach((__node_t)(S->structure_pointer), arg, function);
 }
 
 ////////////////////////////////////////////////////////////////////////////
-static int16_t AVLHeight(struct AVLNode* P) 
+static int16_t AVLHeight(__node_t P) 
 {
 	return P ? P->height : 0;
 }
 
-static int16_t AVLBalanceFactor(struct AVLNode* P) 
+static int16_t AVLBalanceFactor(__node_t P) 
 {
 	return AVLHeight(P->right) - AVLHeight(P->left);
 }
 
-static struct AVLNode* AVLFindMin(struct AVLNode* P) 
+static __node_t AVLFindMin(__node_t P) 
 {
 	return (P->left != NULL) ? AVLFindMin(P->left) : P;
 }
 
-static struct AVLNode* AVLRemoveMin(struct AVLNode* P) 
+static __node_t AVLRemoveMin(__node_t P) 
 {
 	if (P->left == NULL)
 		return P->right;
@@ -120,16 +126,16 @@ static struct AVLNode* AVLRemoveMin(struct AVLNode* P)
 	return AVLBalance(P);
 }
 
-void AVLFixHeight(struct AVLNode* P)
+void AVLFixHeight(__node_t P)
 {
 	int16_t heightLeft = AVLHeight(P->left);
 	int16_t heightRight = AVLHeight(P->right);
 	P->height = ((heightLeft > heightRight) ? heightLeft : heightRight) + 1;
 }
 
-static struct AVLNode* AVLRotateRight(struct AVLNode* P)
+static __node_t AVLRotateRight(__node_t P)
 {
-	struct AVLNode* Q = P->left;
+	__node_t Q = P->left;
 	P->left = Q->right;
 	Q->right = P;
 	AVLFixHeight(P);
@@ -137,9 +143,9 @@ static struct AVLNode* AVLRotateRight(struct AVLNode* P)
 	return Q;
 }
 
-static struct AVLNode* AVLRotateLeft(struct AVLNode* P)
+static __node_t AVLRotateLeft(__node_t P)
 {
-	struct AVLNode* Q = P->right;
+	__node_t Q = P->right;
 	P->right = Q->left;
 	Q->left = P;
 	AVLFixHeight(P);
@@ -147,7 +153,7 @@ static struct AVLNode* AVLRotateLeft(struct AVLNode* P)
 	return Q;
 }
 
-static struct AVLNode* AVLBalance(struct AVLNode* P)
+static __node_t AVLBalance(__node_t P)
 {
 	AVLFixHeight(P);
 	int16_t balanceFactor = AVLBalanceFactor(P);
@@ -164,10 +170,11 @@ static struct AVLNode* AVLBalance(struct AVLNode* P)
 	return P;
 }
 
-static struct AVLNode* AVLInsert(struct AVLNode* P, const void* key, size_t key_size, const void* data, size_t data_size)
+static __node_t AVLInsert(__node_t P, const void* key, 
+						size_t key_size, const void* data, size_t data_size)
 {
 	if (P == NULL) {
-		struct AVLNode* newNode = (struct AVLNode*) calloc (sizeof(struct AVLNode), 1);
+		__node_t newNode = (__node_t) calloc (sizeof(struct AVLNode), 1);
 
 		newNode->key = calloc (key_size + data_size, 1);
 		if (newNode->key == NULL)
@@ -193,7 +200,7 @@ static struct AVLNode* AVLInsert(struct AVLNode* P, const void* key, size_t key_
 	return AVLBalance(P);
 }
 
-static struct AVLNode* AVLRemove(struct AVLNode* P, const void* key, size_t key_size)
+static __node_t AVLRemove(__node_t P, const void* key, size_t key_size)
 {
 	if (!P)
 		return NULL;
@@ -206,15 +213,15 @@ static struct AVLNode* AVLRemove(struct AVLNode* P, const void* key, size_t key_
 		P->right = AVLRemove(P->right, key, key_size);
 	}
 	else {
-		struct AVLNode* Q = P->left;
-		struct AVLNode* R = P->right;
+		__node_t Q = P->left;
+		__node_t R = P->right;
 
 		free(P->key); 
 		free(P);
 		
 		if (!R)
 			return Q;
-		struct AVLNode* Min = AVLFindMin(R);
+		__node_t Min = AVLFindMin(R);
 		Min->right = AVLRemoveMin(R);
 		Min->left = Q;
 		return AVLBalance(Min);
@@ -222,7 +229,7 @@ static struct AVLNode* AVLRemove(struct AVLNode* P, const void* key, size_t key_
 	return AVLBalance(P);
 }
 
-static struct AVLNode* AVLFind(struct AVLNode* P, const void* key, size_t key_size)
+static __node_t AVLFind(__node_t P, const void* key, size_t key_size)
 {
 	if (P == NULL)
 		return NULL;
@@ -237,8 +244,8 @@ static struct AVLNode* AVLFind(struct AVLNode* P, const void* key, size_t key_si
 
 	return NULL;	
 }
-
-static void AVLDBGPrint(struct AVLNode* P, int tab)
+/*
+static void AVLDBGPrint(__node_t P, int tab)
 {
 	if (P != NULL) {
 		AVLDBGPrint(P->left, tab + 1);
@@ -247,9 +254,10 @@ static void AVLDBGPrint(struct AVLNode* P, int tab)
 		printf("%d -> %d\n", *(int*)P->key, *(int*)P->data);
 		AVLDBGPrint(P->right, tab + 1);
 	}
-}
+} 
+//*/
 
-static void	AVLDestroy(struct AVLNode* P)
+static void	AVLDestroy(__node_t P)
 {
 	if (P == NULL)
 		return;
@@ -260,7 +268,7 @@ static void	AVLDestroy(struct AVLNode* P)
 	AVLDestroy(P->right);
 	free(P);
 }
-void AVLForeach(struct AVLNode* P, const void* arg,
+void AVLForeach(__node_t P, const void* arg,
 		void (*function)(const void* key, const void* data, const void* arg))
 {
 	if (P == NULL)
