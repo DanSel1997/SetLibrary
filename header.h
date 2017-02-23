@@ -23,10 +23,10 @@ struct Set {
 		void (*function)(const void* key, const void* data, const void* arg));
 };
 
-struct Set* MapTreeCreate(size_t key_size, size_t data_size);
-struct Set* MapHashCreate(size_t key_size, size_t data_size);
-
 typedef struct Set* map_t;
+map_t MapTreeCreate(size_t key_size, size_t data_size);
+map_t MapHashCreate(size_t key_size, size_t data_size);
+
 
 #ifdef __cplusplus
 	}

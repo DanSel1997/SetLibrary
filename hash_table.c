@@ -6,73 +6,86 @@
 
 #include "header.h"
 
+#define MAX_HASH 256 * 256 * 256
+#define ALLOCATION_STEP 2
+
+struct HT {
+	uint32_t*	allocated;
+	uint32_t*	used;
+	void**		data;
+};
+typedef struct HT* __hash_t;
+/////////////////////////////////////////////////////////////////
 #ifdef __cplusplus
 	extern "C" {
 #endif
 
-void	HashSetValue(struct Set* S, const void* key, const void* data);
-uint8_t	HashGetValue(struct Set* S, const void* key, void* buffer);
-uint8_t HashFindValue(struct Set* S, const void* key);
-void*	HashInit(struct Set* S);
-void	HashDestroy(struct Set* S);
-void	HashRemove(struct Set* S, const void* key);
-void	HashClear(struct Set* S);
-void	HashForeach(struct Set* S, const void* arg,
+void	HashSetValue(map_t S, const void* key, const void* data);
+uint8_t	HashGetValue(map_t S, const void* key, void* buffer);
+uint8_t HashFindValue(map_t S, const void* key);
+void*	HashInit(map_t S);
+void	HashDestroy(map_t S);
+void	HashRemove(map_t S, const void* key);
+void	HashClear(map_t S);
+void	HashForeach(map_t S, const void* arg,
 		void (*function)(const void* key, const void* data, const void* arg));
 
-struct HT* HTInit(size_t key_size, size_t data_size);
-void HTSet(struct HT* H, const void* key, size_t key_size, const void* data, size_t data_size);
-int HTGet(struct HT* H, const void* key, size_t key_size, void* buffer, size_t data_size);
-int HTRemove(struct HT* H, const void* key, size_t key_size, size_t data_size);
-uint8_t HTFind(struct HT* H, const void* key, size_t key_size, size_t data_size);
-void HTClear(struct HT* H);
-void HTDestroy(struct HT* H);
-void HTForeach(struct HT* H, size_t key_size, size_t data_size, const void* arg,
+
+
+__hash_t HTInit(size_t key_size, size_t data_size);
+void	HTSet(__hash_t H, const void* key, size_t key_size, 
+										const void* data, size_t data_size);
+int		HTGet(__hash_t H, const void* key, size_t key_size, 
+										void* buffer, size_t data_size);
+int		HTRemove(__hash_t H, const void* key, 
+										size_t key_size, size_t data_size);
+uint8_t	HTFind(__hash_t H, const void* key, 
+										size_t key_size, size_t data_size);
+void	HTClear(__hash_t H);
+void	HTDestroy(__hash_t H);
+void	HTForeach(__hash_t H, size_t key_size, size_t data_size, 
+										const void* arg,
 		void (*function)(const void* key, const void* data, const void* arg));
 
 
 #ifdef __cplusplus
 	}
 #endif
-
-// HT
-void HashSetValue(struct Set* S, const void* key, const void* data)
+///////////////////////////////////////////////////////////
+void HashSetValue(map_t S, const void* key, const void* data)
 {
-	HTSet((struct HT*)(S->structure_pointer), 
-									key, S->key_size, data, S->data_size);
+	HTSet((__hash_t)(S->structure_pointer), key, S->key_size, data, S->data_size);
 }
-uint8_t	HashGetValue(struct Set* S, const void* key, void* buffer)
+uint8_t	HashGetValue(map_t S, const void* key, void* buffer)
 {
-	return HTGet((struct HT*)(S->structure_pointer), 
-									key, S->key_size, buffer, S->data_size);
+	return HTGet((__hash_t)(S->structure_pointer), key, S->key_size, buffer, S->data_size);
 }
 
-uint8_t HashFindValue(struct Set* S, const void* key)
+uint8_t HashFindValue(map_t S, const void* key)
 {
-	return HTFind((struct HT*)(S->structure_pointer), 
-									key, S->key_size, S->data_size);
+	return HTFind((__hash_t)(S->structure_pointer), key, S->key_size, S->data_size);
 }
 
-void* HashInit(struct Set* S)
+void* HashInit(map_t S)
 {
-	struct HT* result = HTInit(S->key_size, S->data_size);
+	__hash_t result = HTInit(S->key_size, S->data_size);
 	return (void*) result;
 }
 
-void HashDestroy(struct Set* S)
+void HashDestroy(map_t S)
 {
-	HTDestroy((struct HT*)(S->structure_pointer));
+	HTDestroy((__hash_t)(S->structure_pointer));
 	free(S);
 }
 
-void HashRemove(struct Set* S, const void* key)
+void HashRemove(map_t S, const void* key)
 {
-	HTRemove((struct HT*)(S->structure_pointer), key, S->key_size, S->data_size);
+	HTRemove((__hash_t)(S->structure_pointer), key, S->key_size, S->data_size);
 }
 
-void HashClear(struct Set* S)
+void HashClear(map_t S)
 {
-	HTClear((struct HT*)(S->structure_pointer));
+	HTClear((__hash_t)(S->structure_pointer));
 }
 
 uint32_t FAQ6(const void* data, size_t data_size, uint32_t hash_limit)
@@ -93,26 +106,26 @@ uint32_t FAQ6(const void* data, size_t data_size, uint32_t hash_limit)
 	result += result << 15;
 	return result % hash_limit;
 }
-void	HashForeach(struct Set* S, const void* arg,
+
+void HashForeach(map_t S, const void* arg, 
 		void (*function)(const void* key, const void* data, const void* arg))
 {
-	HTForeach((struct HT*)(S->structure_pointer), S->key_size, S->data_size, 
-														arg, function);
+	HTForeach((__hash_t)(S->structure_pointer), S->key_size, S->data_size, 
+												arg, function);
 }
 
 ////////////////////////////////////////////////////////////////////////
-#define MAX_HASH 256 * 256 * 256
-#define ALLOCATION_STEP 2
+#define KEY_POINTER(H, line, index, key_size, data_size) \
+	(((uint8_t*)H->data[line]) + ((key_size) + (data_size)) * (index))
 
-struct HT {
-	uint32_t*	allocated;
-	uint32_t*	used;
-	void**		data;
-};
+#define DATA_POINTER(H, line, index, key_size, data_size) \
+	((((uint8_t*)H->data[line]) + ((key_size) + (data_size)) * \
+												(index)) + (key_size))
 
-struct HT* HTInit(size_t key_size, size_t data_size)
+
+__hash_t HTInit(size_t key_size, size_t data_size)
 {
-	struct HT* result = (struct HT*) calloc (sizeof(struct HT), 1);
+	__hash_t result = (__hash_t) calloc (sizeof(struct HT), 1);
 	if (result == NULL)
 		return NULL;
 
@@ -126,12 +139,12 @@ struct HT* HTInit(size_t key_size, size_t data_size)
 	return result;
 }
 
-void HTSet(struct HT* H, const void* key, size_t key_size, 
+void HTSet(__hash_t H, const void* key, size_t key_size, 
 									const void* data, size_t data_size)
 {
 	uint32_t hash = FAQ6(key, key_size, MAX_HASH);
 	for (uint32_t i = 0; i < H->used[hash]; i++) {
-		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
+		uint8_t* pointer = KEY_POINTER(H, hash, i, key_size, data_size);
 		if (memcmp(key, (void*)pointer, key_size) == 0) {
 			memcpy((void*)(pointer + key_size), data, data_size);
 			return;
@@ -152,13 +165,13 @@ void HTSet(struct HT* H, const void* key, size_t key_size,
 	return;
 }
 
-int HTGet(struct HT* H, const void* key, size_t key_size, 
+int HTGet(__hash_t H, const void* key, size_t key_size, 
 									void* buffer, size_t data_size)
 {
 	uint32_t hash = FAQ6(key, key_size, MAX_HASH);
 	
 	for (uint32_t i = 0; i < H->used[hash]; i++) {
-		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
+		uint8_t* pointer = KEY_POINTER(H, hash, i, key_size, data_size);
 		if (memcmp(key, (void*)pointer, key_size) == 0) {
 			memcpy(buffer, (void*)(pointer + key_size), data_size);
 			return 1;
@@ -167,19 +180,21 @@ int HTGet(struct HT* H, const void* key, size_t key_size,
 	return 0;
 }
 
-int HTRemove(struct HT* H, const void* key, size_t key_size, size_t data_size)
+int HTRemove(__hash_t H, const void* key, size_t key_size, size_t data_size)
 {
 	uint32_t hash = FAQ6(key, key_size, MAX_HASH);
 
 	for (uint32_t i = 0; i < H->used[hash]; i++) {
-		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
+		uint8_t* pointer = KEY_POINTER(H, hash, i, key_size, data_size);
+
 		if (memcmp(key, (void*)pointer, key_size) == 0) {
 			if (i + 1 == H->used[hash])
 				H->used[hash]--;
 			else {
-				uint8_t* pointer_final = ((uint8_t*)H->data[hash]) + 
-					(key_size + data_size) * (H->used[hash] - 1);
-				memcpy((void*)pointer, (void*)pointer_final, key_size + data_size);
+				uint8_t* pointer_final = KEY_POINTER(H, hash, 
+								H->used[hash] - 1, key_size, data_size);
+				memcpy((void*)pointer, (void*)pointer_final, 
+													key_size + data_size);
 				H->used[hash]--;
 			}
 			return 1;
@@ -188,26 +203,26 @@ int HTRemove(struct HT* H, const void* key, size_t key_size, size_t data_size)
 	return 0;
 }
 
-uint8_t HTFind(struct HT* H, const void* key, size_t key_size, size_t data_size)
+uint8_t HTFind(__hash_t H, const void* key, size_t key_size, size_t data_size)
 {
 	uint32_t hash = FAQ6(key, key_size, MAX_HASH);
 	
 	for (uint32_t i = 0; i < H->used[hash]; i++) {
-		uint8_t* pointer = ((uint8_t*)H->data[hash]) + (key_size + data_size) * i;
+		uint8_t* pointer = KEY_POINTER(H, hash, i, key_size, data_size);
 		if (memcmp(key, (void*)pointer, key_size) == 0) 
 			return 1;
 	}
 	return 0;
 }
 
-void HTClear(struct HT* H)
+void HTClear(__hash_t H)
 {
 	for (int i = 0; i < MAX_HASH; i++) {
 		H->used[i] = 0;
 	}
 }
 
-void HTDestroy(struct HT* H)
+void HTDestroy(__hash_t H)
 {
 	for (int i = 0; i < MAX_HASH; i++)
 		free(H->data[i]);
@@ -215,14 +230,13 @@ void HTDestroy(struct HT* H)
 	free(H->allocated);
 }
 
-void HTForeach(struct HT* H, size_t key_size, size_t data_size, const void* arg,
+void HTForeach(__hash_t H, size_t key_size, size_t data_size, const void* arg,
 		void (*function)(const void* key, const void* data, const void* arg))
 {
 	for (uint32_t i = 0; i < MAX_HASH; i++)
 	{
-		for (uint32_t j = 0; j < H->used[i]; j++) { 
-			void* key = ((uint8_t*)H->data[i]) + 
-					(key_size + data_size) * j;
+		for (uint32_t j = 0; j < H->used[i]; j++) {
+			void* key = KEY_POINTER(H, i, j, key_size, data_size);
 			void* data = (uint8_t*)key + key_size;
 			function(key, data, arg);
 		}
